@@ -1,5 +1,5 @@
 =================
- PATRIC Services
+Services
 =================
 
 .. _genome-annotation:

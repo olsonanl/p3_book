@@ -11,20 +11,30 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   introduction	      
+   architecture	      
    services
    configuration
    data_preparation
    tutorials
    current_system
 
-Command line utilities
-======================
+Command line utilities:
 
 .. toctree::
    :maxdepth: 2
    :glob:
 
    commands/*
+
+Schema Reference:
+
+.. toctree::
+   :maxdepth: 2
+   :glob:
+
+   schema_doc/*
+	      
 
 Indices and tables
 ==================

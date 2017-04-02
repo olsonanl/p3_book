@@ -1,5 +1,5 @@
 =============================
- PATRIC System Configuration
+System Configuration
 =============================
 
 The PATRIC system is composed of a large number of interconnected

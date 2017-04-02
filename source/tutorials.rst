@@ -1,5 +1,5 @@
 ==================
- PATRIC Tutorials
+Tutorials
 ==================
 
 .. toctree::

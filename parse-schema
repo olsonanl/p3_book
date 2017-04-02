@@ -1,0 +1,89 @@
+#!/usr/bin/env perl
+
+use Data::Dumper;
+use Text::Table;
+use Template;
+use strict;
+use XML::LibXML;
+use Getopt::Long::Descriptive;
+
+my($opt, $usage) = describe_options("%c %o schema [schema...]",
+				    ["dir|d=s" => "Output directory"],
+				    ["help|h" => 'Show this help message.']);
+
+print($usage->text), exit 0 if $opt->help;
+die $usage->text if @ARGV == 0;
+
+my $parser = XML::LibXML->new;
+
+my $tt = Template->new({
+			INCLUDE_PATH => ".",
+			OUTPUT_PATH => $opt->dir,
+			EVAL_PERL => 1,
+		       });
+
+for my $schema_file (@ARGV)
+{
+    my $doc  = $parser->parse_file($schema_file);
+
+    my $schema = $doc->documentElement();;
+    my $schema_name = $schema->getAttribute('name');
+    print "Schema: $schema_name\n";
+    my $keyNode = $schema->getChildrenByTagName('uniqueKey')->[0];
+    my $key = $keyNode ? $keyNode->textContent : "";
+    my $defaultOp = $schema->getChildrenByTagName('solrQueryParser')->[0]->getAttribute('defaultOperator');
+
+    my %vars = ( core => $schema_name,
+		 key => $key,
+		 default_operator => $defaultOp,
+	       );
+
+    my %copy_to;
+    for my $node ($schema->getChildrenByTagName('copyField'))
+    {
+	my $src = $node->getAttribute('source');
+	my $dest = $node->getAttribute('dest');
+	$copy_to{$src}->{$dest} = 1;
+    }
+
+    my $tbl = Text::Table->new(\"| ", "Field",
+			       \" | ", "Type",
+			       \" | ", "Indexed",
+			       \" | ", "Full-text\nIndexed",
+			       \" | ", "Stored",
+			       \" |");
+
+    my @tdata;
+    for my $field ($schema->findnodes('fields/field'))
+    {
+	my $n = $field->getAttribute('name');
+	my $type = $field->getAttribute('type');
+	my $indexed = $field->getAttribute('indexed');
+	my $stored = $field->getAttribute('stored');
+	my $ft = $copy_to{$n}->{text} ? "yes" : "no";
+	$indexed =~ s/true/yes/;
+	$indexed =~ s/false/no/;
+	$stored =~ s/true/yes/;
+	$stored =~ s/false/no/;
+	push(@tdata, [$n, $type, $indexed, $ft, $stored]);
+    }
+    $tbl->load(@tdata);
+
+    my $txt = $tbl->rule("-", "+");
+    for my $r ($tbl->title())
+    {
+	$txt .= $r;
+    }
+    $txt .= $tbl->rule("=", "+");
+    for my $r ($tbl->body())
+    {
+	$txt .= $r;
+	$txt .= $tbl->rule("-", "+");
+    }
+
+    $vars{table} = $txt;
+		
+    $tt->process("schema.tt", \%vars, "$schema_name.rst")
+	|| die $tt->error(), "\n";
+	
+}

@@ -1,0 +1,20 @@
+.. _solr-[% core %]:
+
+[% PERL %]
+$stash->set('v', $stash->get('core'));
+#$stash->set('v', 'Solr core ' . $stash->get('core'));
+$stash->set('b', '=' x length($stash->get('v')));
+[% END %]
+[% b %]
+[% v %]
+[% b %]
+
+
+[% IF key %]
+Unique key is *[% key %]*.
+[% END %]
+
+Default search operator is *[% default_operator %]*.
+
+
+[% table %]

@@ -4,6 +4,20 @@
 
 .. highlight:: shell
 
+In addition to the PATRIC web interface, we provide a command-line
+interface to the data in the PATRIC database. The command-line
+interface (or CLI) allows one to integrate PATRIC data with existing
+applications, to casually browse the data in text form, and to process
+batches of data queries or computational analyses using the PATRIC
+services.
+
+The CLI consists of two primary components: a set of executable
+command-line scripts and a Perl API module. The command-line scripts are
+typically written in Perl and make calls to the API module. In this
+chapter we will primarly focus on the scripting interface.
+
+
+
 Most of the PATRIC command line tools take as input a file containing
 a single column set or a tab-separated table and they output a
 modified table. The most common modification is the addition of one of
